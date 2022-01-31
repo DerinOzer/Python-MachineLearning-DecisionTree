@@ -30,35 +30,25 @@ def compute_features(img):
 for filename in os.listdir(training_directory):
     if filename[0]!='.':
         class_name=filename.split("_")[0]
-        print(class_name)
         image_fullfilename=os.path.join(training_directory,filename)
-        print(image_fullfilename)
         image=imageio.imread(image_fullfilename)
         axis_ratio,nb_holes=compute_features(image)
-        print(axis_ratio,nb_holes)
         features_list+=[np.array([axis_ratio,nb_holes])]
-        print(features_list)
         label_to_name[label]=class_name
-        print(label_to_name)
         label_list+=[np.asarray([label])]
-        print(label_list)
         label+=1
 
 label_array=np.vstack(tuple(label_list))
 features_array=np.vstack(tuple(features_list))
 clf=tree.DecisionTreeClassifier()
 clf.fit(features_array,label_array)
-print("Features:\n", features_array, "\nLabels:\n", label_array, "\nClass Names:", [label_to_name[i] for i in sorted(label_to_name)])
 
 for filename in os.listdir(unknown_images_directory):
     if filename[0] != '.':
         image_fullfilename=os.path.join(unknown_images_directory,filename)
-        print(image_fullfilename)
         image=imageio.imread(image_fullfilename)
         axis_ratio, nb_holes = compute_features(image)
-        print(axis_ratio,nb_holes)
         label=clf.predict(np.array([[axis_ratio,nb_holes]]))[0]
-        print("Class: ", label_to_name[label])
         name=label_to_name[label]
         index=0
         output_fullfilename=os.path.join(recognized_directory, name+"_"+str(index)+".png")
